@@ -52,19 +52,22 @@ function registerationOfVisitor(email, appId) {
             "country": region,
             "device": device,
             "isReturning": isVisited
-        }).then(() => {
+        }).then((res) => {
+            console.log(res.message);
+            if(res.code==200){
+                // these will call after resolving above promise
+                setCookie("isVisited", true); //marking it so we can know it is returning or new 
 
-            // these will call after resolving above promise
-            setCookie("isVisited", true); //marking it so we can know it is returning or new 
+                //2. listen appSession
+                //3. listen appEvents
+                //4. listen appErrors
 
-            //2. listen appSession
-            //3. listen appEvents
-            //4. listen appErrors
+                //on load will wait till whole dom is not getting loaded
+                listenAppSession(email, appId);
+                listenAppErrors(email, appId);
+                listenAppEvents(email, appId);
 
-            //on load will wait till whole dom is not getting loaded
-            listenAppSession(email, appId);
-            listenAppErrors(email, appId);
-            listenAppEvents(email, appId);
+            }
 
 
 
@@ -278,7 +281,7 @@ async function registerEvent(data) {
                     setGuestId(responseData.data.guestId);
 
                 }
-                console.log(responseData);
+              return (responseData);
             }
         }
     } catch (error) {
