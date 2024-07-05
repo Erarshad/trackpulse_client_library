@@ -3,7 +3,7 @@ function setGuestId(id) {
     guestID = id;
 }
 let apiRegisterEvent = "setup/registerEvent";
-let host = "http://127.0.0.1:3000/"
+let host = "http://127.0.0.1:3300/"
 function trackPulseInit({ email, appId }) {
     injectRRWEB(); //injectRRWEB
     if (typeof email == "string" && typeof appId == "string") {
@@ -53,7 +53,6 @@ function registerationOfVisitor(email, appId) {
             "device": device,
             "isReturning": isVisited
         }).then((res) => {
-            console.log(res.message);
             if(res.code==200){
                 // these will call after resolving above promise
                 setCookie("isVisited", true); //marking it so we can know it is returning or new 
@@ -230,7 +229,7 @@ function listenAppErrors(email, appId) {
 
 
     window.onerror = function (error) {
-        console.log(error);
+        console.log(error); 
         appErrors[currentPath] = error;
         let payload = {
             "email": email,
