@@ -116,13 +116,13 @@ function listenAppSession(email, appId) {
 
 
 
-    //   // save events every 10 seconds
+    //   // save events every 3 seconds
     setInterval(function () {
         registerEvent(
             payload
         );
         events = [];
-    }, 10 * 1000);
+    }, 3 * 1000);
 
 
 }
@@ -135,6 +135,8 @@ function listenAppEvents(email, appId) {
      */
     let currentPath = getCurrentPath();
     let appEvents = {};
+    let clickEvents=[];
+    let scrollEvents=[];
     document.addEventListener('click', function (event) {
         let targetType = event.target.tagName.toLowerCase();
         let targetText = event.target.textContent.trim() || 'No text attached';
@@ -149,11 +151,42 @@ function listenAppEvents(email, appId) {
         // console.log('You clicked on a ' + targetType + ' with text: ' + targetText + ', ID: ' + targetId + ', and class: ' + targetClass);
         let clickEvent = targetType + ":ttid/:" + targetText + ":ttid/:" + targetId + ":ttid/:" + targetClass;
         //":ttid/:" click should get splitted by 
+        clickEvents.push(clickEvent);
 
-        appEvents[currentPath] = {
-            "clicks": [clickEvent],
-            "scroll":[]
+
+    });
+
+   
+
+    let lastKnownScrollPosition = 0;
+    window.addEventListener('scroll', () => {
+        const currentScrollPos = window.pageYOffset;
+        if (currentScrollPos > lastKnownScrollPosition) {
+           
+            scrollEvents.push("down");
+    
+
+            
+
+            
+        } else {
+            
+            scrollEvents.push("up");
+    
         }
+        lastKnownScrollPosition = currentScrollPos;
+    });
+  
+   
+
+    appEvents[currentPath] = {
+        "clicks": clickEvents,
+        "scroll":scrollEvents
+    }
+
+    setInterval(function () {
+
+       if(clickEvents.length>0 || scrollEvents.length>0){
         registerEvent({
             "email": email,
             "appId": appId,
@@ -162,48 +195,9 @@ function listenAppEvents(email, appId) {
 
         });
 
-    });
+      }
 
-    let lastKnownScrollPosition = 0;
-    window.addEventListener('scroll', () => {
-        const currentScrollPos = window.pageYOffset;
-        if (currentScrollPos > lastKnownScrollPosition) {
-           
-            appEvents[currentPath] = {
-                "clicks":[],
-                "scroll": ["down"]
-            }
-
-            registerEvent({
-                "email": email,
-                "appId": appId,
-                "guestId": guestID,
-                appEvents
-    
-            });
-    
-
-            
-
-            
-        } else {
-            
-            appEvents[currentPath] = {
-                "clicks":[],
-                "scroll": ["up"]
-            }
-
-            registerEvent({
-                "email": email,
-                "appId": appId,
-                "guestId": guestID,
-                appEvents
-    
-            });
-    
-        }
-        lastKnownScrollPosition = currentScrollPos;
-    });
+    }, 5 * 1000);  //10 second
 
    
     
