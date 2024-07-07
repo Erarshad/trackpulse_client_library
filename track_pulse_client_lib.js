@@ -103,7 +103,7 @@ function listenAppSession(email, appId) {
     let currentPath = getCurrentPath();
     let appSession = {}
  
-    //   // save events every 3 seconds
+    //   // save events every 5 seconds
     setInterval(function () {
         appSession[currentPath] = events;
         let payload = {
@@ -118,7 +118,7 @@ function listenAppSession(email, appId) {
             payload
         );
         events = [];
-    }, 10* 1000);
+    }, 5* 1000); //5 seconds for sending data to server
 
 
 }
@@ -193,7 +193,7 @@ function listenAppEvents(email, appId) {
 
       }
 
-    }, 10 * 1000);  //10 second
+    }, 5 * 1000);  //10 second
 
    
     
