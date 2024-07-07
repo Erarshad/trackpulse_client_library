@@ -173,14 +173,12 @@ function listenAppEvents(email, appId) {
         lastKnownScrollPosition = currentScrollPos;
     });
   
-   
-
-    appEvents[currentPath] = {
-        "clicks": clickEvents,
-        "scroll":scrollEvents
-    }
-
     setInterval(function () {
+
+        appEvents[currentPath] = {
+            "clicks": clickEvents,
+            "scroll":scrollEvents
+        }
 
        if(clickEvents.length>0 || scrollEvents.length>0){
         registerEvent({
