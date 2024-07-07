@@ -98,31 +98,29 @@ function listenAppSession(email, appId) {
             }
         },
         recordCanvas: true,
-        recordCrossOriginIframes: true
+        recordCrossOriginIframes: true,
+        checkoutEveryNth: 200, // checkout every 200 events
     });
 
     let currentPath = getCurrentPath();
     let appSession = {}
-    appSession[currentPath] = events;
-    let payload = {
-        "email": email,
-        "appId": appId,
-        "guestId": guestID,
-        appSession
-    };
-
-    console.log(guestID);
-
-
-
-
+ 
     //   // save events every 3 seconds
     setInterval(function () {
+        appSession[currentPath] = events;
+        let payload = {
+            "email": email,
+            "appId": appId,
+            "guestId": guestID,
+            appSession
+        };
+    
+        console.log(guestID);
         registerEvent(
             payload
         );
         events = [];
-    }, 3 * 1000);
+    }, 10* 1000);
 
 
 }
@@ -194,10 +192,12 @@ function listenAppEvents(email, appId) {
             appEvents
 
         });
+        clickEvents=[];
+        scrollEvents=[];
 
       }
 
-    }, 5 * 1000);  //10 second
+    }, 10 * 1000);  //10 second
 
    
     
