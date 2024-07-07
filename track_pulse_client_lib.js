@@ -92,14 +92,12 @@ function listenAppSession(email, appId) {
     rrwebRecord({
         emit(event) {
             // push event into the events array
-
             if (event != null) {
                 events.push(event);
             }
         },
         recordCanvas: true,
         recordCrossOriginIframes: true,
-        checkoutEveryNth: 200, // checkout every 200 events
     });
 
     let currentPath = getCurrentPath();
