@@ -216,11 +216,20 @@ function listenAppErrors(email, appId) {
     let currentPath = getCurrentPath();
     let appErrors = {}
 
-
-
-    window.onerror = function (error) {
-        console.log(error); 
-        appErrors[currentPath] = error;
+    window.onerror = function (error, url, line, column, errorObj) {
+        // console.log('Error:', error);
+        // console.log('URL:', url);
+        // console.log('Line:', line);
+        // console.log('Column:', column);
+        // console.log('Stack Trace:', errorObj.stack);
+        //list of error 
+        appErrors[currentPath] = [{
+            "error":error,
+            "url":url,
+            "line":line,
+            "column":column,
+            "Stack Trace":errorObj.stack
+        }];
         let payload = {
             "email": email,
             "appId": appId,
@@ -230,8 +239,12 @@ function listenAppErrors(email, appId) {
 
 
         registerEvent(payload);
+      
+       
     };
+      
 
+   
 
 
 
