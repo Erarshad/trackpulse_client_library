@@ -401,9 +401,3 @@ function deleteCookie(name) {
         document.cookie = `${name}=; expires=${expireDate.toUTCString()}; path=/`;
     }catch{}
 }
-
-
-
-
-
-///--------------------------init=---------------------------
