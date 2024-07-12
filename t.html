@@ -4,6 +4,12 @@
     </head>
     <body>
         it is another page
+        <button onclick="ctestx">Click me</button>
     </body>
     <script src="./track_pulse_client_lib.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            trackPulseInitForOtherPage({ email: "mudassir@amazon.in", appId: "0526290e-f86d-433c-aec7-165bbfe50432" });
+        });
+    </script>
 </html>

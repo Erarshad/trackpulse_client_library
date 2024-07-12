@@ -1,15 +1,53 @@
 let guestID = null;
 function setGuestId(id) {
     guestID = id;
+    setCookie("guestId",guestID);
+}
+function setGuestIdWOCookie(id) {
+    guestID = id;
 }
 let apiRegisterEvent = "setup/registerEvent";
 let host = "http://127.0.0.1:3300/"
-function trackPulseInit({ email, appId }) {
+function trackPulseInitForRootPage({ email, appId }) {
+   
+    if (checkCookie("guestId")==true) {
+        deleteCookie("guestId");
+    
+    } 
+        //this function is responsible for handling the root page registration, what ever page user is going to land first 
     injectRRWEB(); //injectRRWEB
     if (typeof email == "string" && typeof appId == "string") {
         window.onload = function () {
             // Code to execute when the page has fully loaded
-            registerationOfVisitor(email, appId);
+            registerationOfVisitor(email, appId,false);
+        };
+
+
+    } else {
+        console.error("Please pass valid email and appId as String.");
+    }
+
+
+
+
+}
+
+function trackPulseInitForOtherPage({ email, appId }) {
+    //this function is responsible for handling the other page, here user can track other pages which will come after the root page
+   
+    let retrivedGuestId=getCookie("guestId")??"";
+    if(retrivedGuestId==null || retrivedGuestId.length==0){
+        console.error("Root page is not registered via the trackPulseInitForRootPage function");
+        return;
+    }else{
+        setGuestIdWOCookie(retrivedGuestId)
+    }
+
+    injectRRWEB(); //injectRRWEB
+    if (typeof email == "string" && typeof appId == "string") {
+        window.onload = function () {
+            // Code to execute when the page has fully loaded
+            registerationOfVisitor(email, appId,true);
         };
 
 
@@ -36,51 +74,67 @@ function injectRRWEB() {
 
 //fx
 
-function registerationOfVisitor(email, appId) {
-    if (typeof email == "string" && typeof appId == "string") {
-        //extract the country and device and cache (isreturning)
-        let device = identifyDevice();
-        let region = regionAndCountry();
-        let isVisited = getCookie("isVisited") ?? false;
-        //make an api cALL for registering session 
-        //after that mark visited 
+function registerationOfVisitor(email, appId, isForOtherPages) {
+    if (isForOtherPages === false) {
+        if (typeof email == "string" && typeof appId == "string") {
+            //extract the country and device and cache (isreturning)
+            let device = identifyDevice();
+            let region = regionAndCountry();
+            let isVisited = getCookie("isVisited") ?? false;
+            //make an api cALL for registering session 
+            //after that mark visited 
 
-        //now register the session with details
-        registerEvent({
-            "email": email,
-            "appId": appId,
-            "country": region,
-            "device": device,
-            "isReturning": isVisited
-        }).then((res) => {
-            if(res.code==200){
-                // these will call after resolving above promise
-                setCookie("isVisited", true); //marking it so we can know it is returning or new 
+            //now register the session with details
+            registerEvent({
+                "email": email,
+                "appId": appId,
+                "country": region,
+                "device": device,
+                "isReturning": isVisited
+            }).then((res) => {
+                if (res.code == 200) {
+                    // these will call after resolving above promise
+                    setCookie("isVisited", true); //marking it so we can know it is returning or new 
 
-                //2. listen appSession
-                //3. listen appEvents
-                //4. listen appErrors
+                    //2. listen appSession
+                    //3. listen appEvents
+                    //4. listen appErrors
 
-                //on load will wait till whole dom is not getting loaded
-                listenAppSession(email, appId);
-                listenAppErrors(email, appId);
-                listenAppEvents(email, appId);
+                    //on load will wait till whole dom is not getting loaded
+                    listenAppSession(email, appId);
+                    listenAppErrors(email, appId);
+                    listenAppEvents(email, appId);
 
-            }
-
-
-
-
-
-        });
+                }
 
 
 
 
 
+            });
 
+
+
+
+
+
+        } else {
+            console.error("Please pass valid email and appId as String.");
+        }
     } else {
-        console.error("Please pass valid email and appId as String.");
+        //these will trigger when it is for other pages, without need of again registering 
+            // these will call after resolving above promise
+            setCookie("isVisited", true); //marking it so we can know it is returning or new 
+
+            //2. listen appSession
+            //3. listen appEvents
+            //4. listen appErrors
+
+            //on load will wait till whole dom is not getting loaded
+            listenAppSession(email, appId);
+            listenAppErrors(email, appId);
+            listenAppEvents(email, appId);
+
     }
 
 }
@@ -334,8 +388,22 @@ function getCookie(name) {
     return null;
 }
 
+// Check if the cookie exists
+function checkCookie(name) {
+    const cookies = document.cookie.split("; ");
+    return cookies.some((cookie) => cookie.startsWith(`${name}=`));
+}
+
+// Delete the cookie
+function deleteCookie(name) {
+    try{
+        const expireDate = new Date(0);
+        document.cookie = `${name}=; expires=${expireDate.toUTCString()}; path=/`;
+    }catch{}
+}
+
+
 
 
 
 ///--------------------------init=---------------------------
-trackPulseInit({ email: "mudassir@amazon.in", appId: "0526290e-f86d-433c-aec7-165bbfe50432" });
